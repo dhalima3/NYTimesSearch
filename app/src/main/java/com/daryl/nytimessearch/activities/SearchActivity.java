@@ -2,13 +2,16 @@ package com.daryl.nytimessearch.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 
 import com.daryl.nytimessearch.R;
@@ -28,10 +31,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity {
 
-    EditText etQuery;
     GridView gvResults;
-    Button btnSearch;
-
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
 
@@ -44,10 +44,30 @@ public class SearchActivity extends AppCompatActivity {
         setupViews();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search_activity, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchArticleWith(query);
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
     public void setupViews() {
-        etQuery = (EditText) findViewById(R.id.etQuery);
         gvResults = (GridView) findViewById(R.id.gvResults);
-        btnSearch = (Button) findViewById(R.id.btnSearch);
         articles = new ArrayList<>();
         adapter = new ArticleArrayAdapter(this, articles);
         gvResults.setAdapter(adapter);
@@ -63,9 +83,7 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    public void onArticleSearch(View view) {
-        String query = etQuery.getText().toString();
-
+    public void searchArticleWith(String query) {
         AsyncHttpClient client = new AsyncHttpClient();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
 
