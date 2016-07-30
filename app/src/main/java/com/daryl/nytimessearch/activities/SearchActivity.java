@@ -120,7 +120,8 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
     private void showFilterSearchDialog() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FilterSearchDialogFragment filterSearchDialogFragment = FilterSearchDialogFragment.newInstance(
-                getString(R.string.filter_search_fragment_title));
+                getString(R.string.filter_search_fragment_title), beginDate, sortOrder, isArts,
+                isFashionAndStyle, isSports);
         filterSearchDialogFragment.show(fragmentManager, "fragment_filter_search");
     }
 

@@ -42,10 +42,18 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
         // Required empty public constructor
     }
 
-    public static FilterSearchDialogFragment newInstance(String title) {
+    public static FilterSearchDialogFragment newInstance(String title, String beginDate,
+                                                         String sortOrder, boolean isArts,
+                                                         boolean isFashionAndStyle,
+                                                         boolean isSports) {
         FilterSearchDialogFragment fragment = new FilterSearchDialogFragment();
         Bundle args = new Bundle();
         args.putString("title", title);
+        args.putString("beginDate", beginDate);
+        args.putString("sortOrder", sortOrder);
+        args.putBoolean("isArts", isArts);
+        args.putBoolean("isFashionAndStyle", isFashionAndStyle);
+        args.putBoolean("isSports", isSports);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,7 +82,7 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
 
     private void setUpDatePickerEditText(View view) {
         etFilterDate = (EditText) view.findViewById(R.id.etFilterDate);
-        etFilterDate.setText(new SimpleDateFormat("MM/dd/yy").format(new Date()));
+        etFilterDate.setText(beginDate());
         etFilterDate.setInputType(InputType.TYPE_NULL);
         etFilterDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +103,17 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
                 }
             }
         });
+    }
+
+    private String beginDate() {
+        String beginDate = new SimpleDateFormat("MM/dd/yy").format(new Date());
+        if (getArguments().getString("beginDate") != null) {
+            SimpleDateFormat originalDateFormat = new SimpleDateFormat("yyyyMMdd");
+            SimpleDateFormat targetDateFormat = new SimpleDateFormat("MM/dd/yy");
+            beginDate = convertDateFromTo(originalDateFormat, targetDateFormat,
+                    getArguments().getString("beginDate"));
+        }
+        return beginDate;
     }
 
     private void setUpSortOrderSpinner(View view) {
@@ -123,6 +142,15 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
         cbArts = (CheckBox) view.findViewById(R.id.cbArts);
         cbFashionAndStyle = (CheckBox) view.findViewById(R.id.cbFashionAndStyle);
         cbSports = (CheckBox) view.findViewById(R.id.cbSports);
+        if (getArguments().getBoolean("isArts")) {
+            cbArts.setChecked(true);
+        }
+        if (getArguments().getBoolean("isFashionAndStyle")) {
+            cbFashionAndStyle.setChecked(true);
+        }
+        if (getArguments().getBoolean("isSports")) {
+            cbSports.setChecked(true);
+        }
     };
 
     private void setUpSaveButton(View view) {
@@ -141,21 +169,24 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
         boolean isArts = cbArts.isChecked();
         boolean isFashionAndStyle = cbFashionAndStyle.isChecked();
         boolean isSports = cbSports.isChecked();
-        listener.onFinishFilterSearchDialog(dateValue(), sortOrderValue, isArts, isFashionAndStyle,
+        SimpleDateFormat originalDateFormat = new SimpleDateFormat("MM/dd/yy");
+        SimpleDateFormat targetDateFormat = new SimpleDateFormat("yyyyMMdd");
+        String dateValue = convertDateFromTo(originalDateFormat, targetDateFormat,
+                etFilterDate.getText().toString());
+        listener.onFinishFilterSearchDialog(dateValue, sortOrderValue, isArts, isFashionAndStyle,
                 isSports);
         dismiss();
     }
 
-    private String dateValue() {
-        String dueDate = "";
+    private String convertDateFromTo(DateFormat originalDateFormat, DateFormat targetDateFormat,
+                                     String originalDate) {
+        String targetDate = "";
         try {
-            DateFormat originalFormat = new SimpleDateFormat("MM/dd/yy");
-            DateFormat targetFormat = new SimpleDateFormat("yyyyMMdd");
-            Date date = originalFormat.parse(etFilterDate.getText().toString());
-            dueDate = targetFormat.format(date);
+            Date date = originalDateFormat.parse(originalDate);
+            targetDate = targetDateFormat.format(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return dueDate;
+        return targetDate;
     }
 }
