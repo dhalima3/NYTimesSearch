@@ -4,4 +4,13 @@
     <string name="searchHint">Enter Search Query</string>
     <string name="search">Search</string>
     <string name="title_activity_article">ArticleActivity</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="begin_date_label">Begin Date:</string>
+    <string name="sort_order_label">Sort Order:</string>
+    <string name="news_desk_label">News Desk:</string>
+    <string name="arts">Arts</string>
+    <string name="sports">Sports</string>
+    <string name="fashion_and_style"><![CDATA[Fashion & Style]]></string>
+    <string name="search_settings">Search Settings</string>
+    <string name="filter_search_fragment_title">Filter Articles</string>
 </resources>
