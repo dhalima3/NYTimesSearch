@@ -1,5 +1,6 @@
 package com.daryl.nytimessearch.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -12,11 +13,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.daryl.nytimessearch.R;
 import com.daryl.nytimessearch.adapters.ArticlesAdapter;
 import com.daryl.nytimessearch.fragments.FilterSearchDialogFragment;
 import com.daryl.nytimessearch.fragments.FilterSearchDialogFragment.FilterSearchDialogListener;
+import com.daryl.nytimessearch.helpers.ItemClickSupport;
 import com.daryl.nytimessearch.models.Article;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -77,6 +80,17 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
         int columns = 4;
         rvArticles.setLayoutManager(new StaggeredGridLayoutManager(columns,
                 StaggeredGridLayoutManager.VERTICAL));
+
+        ItemClickSupport.addTo(rvArticles).setOnItemClickListener(
+                new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        Intent intent = new Intent(getApplicationContext(), ArticleActivity.class);
+                        Article article = articles.get(position);
+                        intent.putExtra("article", article);
+                        startActivity(intent);
+                    }
+                });
     }
 
     private void setUpSearchView(Menu menu) {
