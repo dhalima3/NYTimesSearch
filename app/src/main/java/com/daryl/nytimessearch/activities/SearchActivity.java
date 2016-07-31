@@ -1,22 +1,20 @@
 package com.daryl.nytimessearch.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import com.daryl.nytimessearch.R;
-import com.daryl.nytimessearch.adapters.ArticleArrayAdapter;
+import com.daryl.nytimessearch.adapters.ArticlesAdapter;
 import com.daryl.nytimessearch.fragments.FilterSearchDialogFragment;
 import com.daryl.nytimessearch.fragments.FilterSearchDialogFragment.FilterSearchDialogListener;
 import com.daryl.nytimessearch.models.Article;
@@ -34,9 +32,9 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements FilterSearchDialogListener {
 
-    private GridView gvResults;
+    private RecyclerView rvArticles;
     private ArrayList<Article> articles;
-    private ArticleArrayAdapter adapter;
+    private ArticlesAdapter adapter;
     private String beginDate;
     private String sortOrder;
     private boolean isArts;
@@ -72,20 +70,13 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
     }
 
     public void setupViews() {
-        gvResults = (GridView) findViewById(R.id.gvResults);
+        rvArticles = (RecyclerView) findViewById(R.id.rvArticles);
         articles = new ArrayList<>();
-        adapter = new ArticleArrayAdapter(this, articles);
-        gvResults.setAdapter(adapter);
-
-        gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), ArticleActivity.class);
-                Article article = articles.get(position);
-                intent.putExtra("article", article);
-                startActivity(intent);
-            }
-        });
+        adapter = new ArticlesAdapter(articles, this);
+        rvArticles.setAdapter(adapter);
+        int columns = 4;
+        rvArticles.setLayoutManager(new StaggeredGridLayoutManager(columns,
+                StaggeredGridLayoutManager.VERTICAL));
     }
 
     private void setUpSearchView(Menu menu) {
@@ -151,7 +142,11 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
 
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    adapter.addAll(Article.fromJSONArray(articleJsonResults));
+                    int currentSize = articles.size();
+                    articles.clear();
+                    adapter.notifyItemRangeRemoved(0, currentSize);
+                    articles.addAll(Article.fromJSONArray(articleJsonResults));
+                    adapter.notifyItemRangeInserted(0, articles.size());
                     Log.d("DEBUG", articles.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
