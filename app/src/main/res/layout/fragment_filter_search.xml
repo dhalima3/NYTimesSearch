@@ -58,23 +58,30 @@
             android:layout_height="wrap_content"
             android:text="@string/news_desk_label" />
 
-        <CheckBox
-            android:id="@+id/cbArts"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/rowCheckboxesNewsDesk"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/arts" />
+            android:orientation="vertical">
 
-        <CheckBox
-            android:id="@+id/cbFashionAndStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/fashion_and_style" />
+            <CheckBox
+                android:id="@+id/cbArts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/arts" />
 
-        <CheckBox
-            android:id="@+id/cbSports"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sports" />
+            <CheckBox
+                android:id="@+id/cbFashionAndStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fashion_and_style" />
+
+            <CheckBox
+                android:id="@+id/cbSports"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sports" />
+        </LinearLayout>
     </LinearLayout>
 
     <Button
