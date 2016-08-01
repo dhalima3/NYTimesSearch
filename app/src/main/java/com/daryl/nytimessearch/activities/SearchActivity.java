@@ -34,11 +34,16 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements FilterSearchDialogListener {
 
-    private RecyclerView rvArticles;
+    @BindView(R.id.rvArticles)
+    RecyclerView rvArticles;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     private ArrayList<Article> articles;
     private ArticlesAdapter adapter;
     private String beginDate;
@@ -52,7 +57,7 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         setupViews();
     }
@@ -77,7 +82,6 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
     }
 
     public void setupViews() {
-        rvArticles = (RecyclerView) findViewById(R.id.rvArticles);
         articles = new ArrayList<>();
         adapter = new ArticlesAdapter(articles, this);
         rvArticles.setAdapter(adapter);

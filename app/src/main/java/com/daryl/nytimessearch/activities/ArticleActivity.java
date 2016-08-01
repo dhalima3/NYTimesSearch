@@ -15,23 +15,27 @@ import android.webkit.WebViewClient;
 import com.daryl.nytimessearch.R;
 import com.daryl.nytimessearch.models.Article;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class ArticleActivity extends AppCompatActivity {
 
-    private WebView wvArticle;
+    @BindView(R.id.wvArticle)
+    WebView wvArticle;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     private ShareActionProvider miShareAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         setupWebview();
     }
 
     private void setupWebview() {
-        wvArticle = (WebView) findViewById(R.id.wvArticle);
-
         Article article = (Article) getIntent().getSerializableExtra("article");
         wvArticle.setWebViewClient(new WebViewClient() {
             @Override
@@ -53,7 +57,6 @@ public class ArticleActivity extends AppCompatActivity {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
 
-        WebView wvArticle = (WebView) findViewById(R.id.wvArticle);
         shareIntent.putExtra(Intent.EXTRA_TEXT, wvArticle.getUrl());
 
         miShareAction.setShareIntent(shareIntent);

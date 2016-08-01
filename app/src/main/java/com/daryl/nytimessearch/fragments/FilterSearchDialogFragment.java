@@ -11,8 +11,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.daryl.nytimessearch.R;
@@ -22,22 +24,46 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class FilterSearchDialogFragment extends DialogFragment implements CalendarDatePickerDialogFragment.OnDateSetListener {
 
     private static final String FRAG_TAG_DATE_PICKER = "Date Picker";
 
-    private EditText etFilterDate;
-    private Spinner spSortOrder;
-    private CheckBox cbArts;
-    private CheckBox cbFashionAndStyle;
-    private CheckBox cbSports;
-    private Button btnSave;
+    @BindView(R.id.tvFilterDate)
+    TextView tvFilterDate;
+    @BindView(R.id.etFilterDate)
+    EditText etFilterDate;
+    @BindView(R.id.rowFilterDate)
+    LinearLayout rowFilterDate;
+    @BindView(R.id.tvFilterSortOrder)
+    TextView tvFilterSortOrder;
+    @BindView(R.id.spSortOrder)
+    Spinner spSortOrder;
+    @BindView(R.id.rowFilterSortOrder)
+    LinearLayout rowFilterSortOrder;
+    @BindView(R.id.tvNewsType)
+    TextView tvNewsType;
+    @BindView(R.id.cbArts)
+    CheckBox cbArts;
+    @BindView(R.id.cbFashionAndStyle)
+    CheckBox cbFashionAndStyle;
+    @BindView(R.id.cbSports)
+    CheckBox cbSports;
+    @BindView(R.id.rowCheckboxesNewsDesk)
+    LinearLayout rowCheckboxesNewsDesk;
+    @BindView(R.id.rowFilterNewsDesk)
+    LinearLayout rowFilterNewsDesk;
+    @BindView(R.id.btnSave)
+    Button btnSave;
 
     public interface FilterSearchDialogListener {
 
         void onFinishFilterSearchDialog(String beginDate, String sortOrder, boolean isArts,
                                         boolean isFashionAndStyle, boolean isSports);
     }
+
     public FilterSearchDialogFragment() {
         // Required empty public constructor
     }
@@ -61,7 +87,9 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_filter_search, container, false);
+        View view = inflater.inflate(R.layout.fragment_filter_search, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -81,7 +109,6 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
     }
 
     private void setUpDatePickerEditText(View view) {
-        etFilterDate = (EditText) view.findViewById(R.id.etFilterDate);
         etFilterDate.setText(beginDate());
         etFilterDate.setInputType(InputType.TYPE_NULL);
         etFilterDate.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +144,6 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
     }
 
     private void setUpSortOrderSpinner(View view) {
-        spSortOrder = (Spinner) view.findViewById(R.id.spSortOrder);
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.sort_order_arrays, android.R.layout.simple_spinner_dropdown_item);
         spSortOrder.setAdapter(spinnerAdapter);
@@ -139,9 +165,6 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
     }
 
     private void setUpCheckboxes(final View view) {
-        cbArts = (CheckBox) view.findViewById(R.id.cbArts);
-        cbFashionAndStyle = (CheckBox) view.findViewById(R.id.cbFashionAndStyle);
-        cbSports = (CheckBox) view.findViewById(R.id.cbSports);
         if (getArguments().getBoolean("isArts")) {
             cbArts.setChecked(true);
         }
@@ -151,10 +174,9 @@ public class FilterSearchDialogFragment extends DialogFragment implements Calend
         if (getArguments().getBoolean("isSports")) {
             cbSports.setChecked(true);
         }
-    };
+    }
 
     private void setUpSaveButton(View view) {
-        btnSave = (Button) view.findViewById(R.id.btnSave);
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
