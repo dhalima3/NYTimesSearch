@@ -5,34 +5,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.daryl.nytimessearch.R;
+import com.daryl.nytimessearch.adapters.viewholders.ArticleWithImageViewHolder;
+import com.daryl.nytimessearch.adapters.viewholders.ArticleWithOnlyTextViewHolder;
 import com.daryl.nytimessearch.models.Article;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHolder> {
+public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    // Provide a direct reference to each of the views within a data item
-    // Used to cache the views within the item layout for fast access
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        // Your holder should contain a member variable
-        // for any view that will be set as you render a row
-        public ImageView ivImage;
-        public TextView tvTitle;
-
-        // We also create a constructor that accepts the entire item row
-        // and does the view lookups to find each subview
-        public ViewHolder(View itemView) {
-            super(itemView);
-
-            ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-        }
-    }
+    private final int ARTICLE_WITH_JUST_TEXT = 0;
+    private final int ARTICLE_WITH_IMAGE = 1;
 
     private List<Article> mArticles;
     private Context mContext;
@@ -48,27 +33,48 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
 
     // Usually involves inflating a layout from XML and returning the holder
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View articleView = inflater.inflate(R.layout.item_article_result, parent, false);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        RecyclerView.ViewHolder viewHolder;
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
 
-        ViewHolder viewHolder = new ViewHolder(articleView);
+        switch (viewType) {
+            case ARTICLE_WITH_JUST_TEXT:
+                View viewArticleWithJustText = inflater.inflate(R.layout.
+                        layout_article_with_only_text_viewholder, viewGroup, false);
+                viewHolder = new ArticleWithOnlyTextViewHolder(viewArticleWithJustText);
+                break;
+            case ARTICLE_WITH_IMAGE:
+                View viewArticleWithImage = inflater.inflate(R.layout.
+                        layout_article_with_image_viewholder, viewGroup, false);
+                viewHolder = new ArticleWithImageViewHolder(viewArticleWithImage);
+                break;
+            default:
+                viewArticleWithJustText = inflater.inflate(R.layout.
+                        layout_article_with_only_text_viewholder, viewGroup, false);
+                viewHolder = new ArticleWithOnlyTextViewHolder(viewArticleWithJustText);
+                break;
+        }
         return viewHolder;
     }
 
-    // Involves populating data into the item through holder
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Article article = mArticles.get(position);
-
-        ImageView ivImage = holder.ivImage;
-        String imageThumbnail = article.getThumbNail();
-        if (imageThumbnail != null && !imageThumbnail.isEmpty()) {
-            Picasso.with(getContext()).load(imageThumbnail).into(ivImage);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()) {
+            case ARTICLE_WITH_JUST_TEXT:
+                ArticleWithOnlyTextViewHolder articleWithOnlyTextViewHolder =
+                        (ArticleWithOnlyTextViewHolder) holder;
+                configureArticleWithJustTextViewHolder(articleWithOnlyTextViewHolder, position);
+                break;
+            case ARTICLE_WITH_IMAGE:
+                ArticleWithImageViewHolder articleWithImageViewHolder =
+                        (ArticleWithImageViewHolder) holder;
+                configureArticleWithImageViewHolder(articleWithImageViewHolder, position);
+                break;
+            default:
+                articleWithOnlyTextViewHolder = (ArticleWithOnlyTextViewHolder) holder;
+                configureArticleWithJustTextViewHolder(articleWithOnlyTextViewHolder, position);
+                break;
         }
-        TextView tvTitle = holder.tvTitle;
-        tvTitle.setText(article.getHeadline());
     }
 
     @Override
@@ -76,4 +82,33 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
         return mArticles.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (mArticles.get(position).getThumbNail() != null &&
+                !mArticles.get(position).getThumbNail().isEmpty()) {
+            return ARTICLE_WITH_IMAGE;
+        } else if (!mArticles.get(position).getHeadline().isEmpty()){
+            return ARTICLE_WITH_JUST_TEXT;
+        }
+        return -1;
+    }
+
+    private void configureArticleWithJustTextViewHolder(ArticleWithOnlyTextViewHolder viewHolder,
+                                                        int position) {
+        Article article = mArticles.get(position);
+        if (article.getHeadline() != null) {
+            viewHolder.getTvTitleInOnlyTextArticle().setText(article.getHeadline());
+        }
+    }
+
+    private void configureArticleWithImageViewHolder(ArticleWithImageViewHolder viewHolder,
+                                                     int position) {
+        Article article = mArticles.get(position);
+        String thumbNail = article.getThumbNail();
+        if (thumbNail != null && !thumbNail.isEmpty() &&
+                article.getHeadline() != null) {
+            viewHolder.getTvTitle().setText(article.getHeadline());
+            Picasso.with(getContext()).load(thumbNail).into(viewHolder.getIvImage());
+        }
+    }
 }
