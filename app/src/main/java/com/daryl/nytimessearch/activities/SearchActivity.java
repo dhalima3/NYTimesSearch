@@ -105,7 +105,7 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
     }
 
     private void setUpSearchView(Menu menu) {
-        MenuItem searchItem = menu.findItem(R.id.action_search);
+        MenuItem searchItem = menu.findItem(R.id.action_search_activity_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
