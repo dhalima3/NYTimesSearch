@@ -19,6 +19,7 @@ import com.daryl.nytimessearch.R;
 import com.daryl.nytimessearch.adapters.ArticlesAdapter;
 import com.daryl.nytimessearch.fragments.FilterSearchDialogFragment;
 import com.daryl.nytimessearch.fragments.FilterSearchDialogFragment.FilterSearchDialogListener;
+import com.daryl.nytimessearch.helpers.EndlessRecyclerViewScrollListener;
 import com.daryl.nytimessearch.helpers.ItemClickSupport;
 import com.daryl.nytimessearch.models.Article;
 import com.loopj.android.http.AsyncHttpClient;
@@ -43,6 +44,7 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
     private boolean isArts;
     private boolean isFashionAndStyle;
     private boolean isSports;
+    private String searchQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +80,15 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
         adapter = new ArticlesAdapter(articles, this);
         rvArticles.setAdapter(adapter);
         int columns = 4;
-        rvArticles.setLayoutManager(new StaggeredGridLayoutManager(columns,
-                StaggeredGridLayoutManager.VERTICAL));
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(columns,
+                StaggeredGridLayoutManager.VERTICAL);
+        rvArticles.setLayoutManager(layoutManager);
+        rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                searchArticleWith(searchQuery, page);
+            }
+        });
 
         ItemClickSupport.addTo(rvArticles).setOnItemClickListener(
                 new ItemClickSupport.OnItemClickListener() {
@@ -99,7 +108,10 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchArticleWith(query);
+                searchQuery = query;
+                clearArticlesList();
+                int firstPage = 0;
+                searchArticleWith(query, firstPage);
                 searchView.clearFocus();
                 return true;
             }
@@ -109,6 +121,12 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
                 return false;
             }
         });
+    }
+
+    private void clearArticlesList() {
+        int currentSize = articles.size();
+        articles.clear();
+        adapter.notifyItemRangeRemoved(0, currentSize);
     }
 
     private void setUpFilterFragment(Menu menu) {
@@ -130,7 +148,7 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
         filterSearchDialogFragment.show(fragmentManager, "fragment_filter_search");
     }
 
-    public void searchArticleWith(String query) {
+    public void searchArticleWith(String query, int page) {
         AsyncHttpClient client = new AsyncHttpClient();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
 
@@ -138,6 +156,7 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
         params.put("api-key", "7c0da1f2f8ad45e387570d038ed0aab5");
         params.put("page", 0);
         params.put("q", query);
+        params.put("page", page);
         if (beginDate != null && !beginDate.isEmpty()) {
             params.put("begin_date", beginDate);
         }
@@ -157,10 +176,8 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
                     int currentSize = articles.size();
-                    articles.clear();
-                    adapter.notifyItemRangeRemoved(0, currentSize);
                     articles.addAll(Article.fromJSONArray(articleJsonResults));
-                    adapter.notifyItemRangeInserted(0, articles.size());
+                    adapter.notifyItemRangeInserted(currentSize, articles.size());
                     Log.d("DEBUG", articles.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
