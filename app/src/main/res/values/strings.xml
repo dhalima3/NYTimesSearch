@@ -13,4 +13,6 @@
     <string name="fashion_and_style"><![CDATA[Fashion & Style]]></string>
     <string name="search_settings">Search Settings</string>
     <string name="filter_search_fragment_title">Filter Articles</string>
+    <string name="internet_unavailable_message">Internet is not available.</string>
+    <string name="query_error_message">Search Query invalid.</string>
 </resources>

@@ -2,6 +2,7 @@ package com.daryl.nytimessearch.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import com.daryl.nytimessearch.adapters.ArticlesAdapter;
 import com.daryl.nytimessearch.fragments.FilterSearchDialogFragment;
 import com.daryl.nytimessearch.fragments.FilterSearchDialogFragment.FilterSearchDialogListener;
 import com.daryl.nytimessearch.helpers.EndlessRecyclerViewScrollListener;
+import com.daryl.nytimessearch.helpers.InternetCheckUtil;
 import com.daryl.nytimessearch.helpers.ItemClickSupport;
 import com.daryl.nytimessearch.models.Article;
 import com.loopj.android.http.AsyncHttpClient;
@@ -149,6 +151,12 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
     }
 
     public void searchArticleWith(String query, int page) {
+        if (!InternetCheckUtil.isOnline()) {
+            Snackbar.make(rvArticles, R.string.internet_unavailable_message,
+                    Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
         AsyncHttpClient client = new AsyncHttpClient();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
 
@@ -186,6 +194,8 @@ public class SearchActivity extends AppCompatActivity implements FilterSearchDia
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Snackbar.make(rvArticles, R.string.query_error_message,
+                        Snackbar.LENGTH_LONG).show();
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
