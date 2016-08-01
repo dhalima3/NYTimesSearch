@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">NYTimesSearch</string>
-    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_search">NY Times Search</string>
     <string name="searchHint">Enter Search Query</string>
     <string name="search">Search</string>
-    <string name="title_activity_article">ArticleActivity</string>
+    <string name="title_activity_article">Article</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="begin_date_label">Begin Date:</string>
     <string name="sort_order_label">Sort Order:</string>
